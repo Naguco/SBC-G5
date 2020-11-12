@@ -1,5 +1,5 @@
-const char* ssid = "vodafoneAA9CZ2";
-const char* password = "3GNHFNxKEXk9Yn6t";
+const char* ssid = "SBC";
+const char* password = "sbc$2020";
 
 void wifiSetup() {
   WiFi.mode(WIFI_STA);

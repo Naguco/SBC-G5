@@ -2,7 +2,6 @@
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include <HTTPClient.h>
 #include <PubSubClient.h>
 
 #define TOKEN "5Rdt2HPlKGz6bBQjc5Fc"
@@ -19,12 +18,11 @@ char data[] = "Hola";
 // Declaraciones funciones globales.
 void wifiSetup();
 void otaSetup();
-//void sendDataExample();
 void mqttSetup();
 void mqttReconnect();
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Booting");
   wifiSetup();
   otaSetup();
@@ -40,6 +38,7 @@ void loop() {
     mqttReconnect();
   }
   client.loop();
-  publishData(data);
-  delay(10000);
+  
+  publishData("Moisture",readMoisture());
+  delay(500);
 }
