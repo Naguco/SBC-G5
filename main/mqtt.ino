@@ -26,5 +26,4 @@ void publishData(String sensor, int value) {
   json.toCharArray(charBuf,100);
 
   client.publish(publishTopic, charBuf);
-
 }
