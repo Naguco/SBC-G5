@@ -7,7 +7,7 @@
 
 #define TOKEN "5Rdt2HPlKGz6bBQjc5Fc"
 #define CLIENTID "d76a30a0-24ea-11eb-b0e1-d73cf2f8386f"
-#define DHTPIN 35
+#define DHTPIN 32
 #define DHTTYPE DHT22
 
 // Declaraciones variables globales.
@@ -48,9 +48,10 @@ void loop() {
     mqttReconnect();
   }
   client.loop();
-  
-  // publishData("Moisture",readMoisture());
+  //float temp = map(analogRead(33), 4095, 1, -60, 150);
+  //Serial.println(analogRead(33));
+  publishData("Moisture",readMoisture());
   publishData("Temperatura", (int) leerTemperatura());
   publishData("Humedad", (int) leerHumedad());
-  delay(500);
+  delay(5000);
 }
