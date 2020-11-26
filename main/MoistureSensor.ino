@@ -1,4 +1,4 @@
-const int AirValue = 2432;   //you need to replace this value with Value_1
+const int AirValue = 4095;   //you need to replace this value with Value_1
 const int WaterValue = 1;  //you need to replace this value with Value_2
 int soilMoistureValue = 0;
 int soilmoisturepercent = 0;
