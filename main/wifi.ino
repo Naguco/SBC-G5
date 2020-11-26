@@ -1,4 +1,4 @@
-const char* ssid = "FranPrueba";
+const char* ssid = "SBC";
 const char* password = "sbc$2020";
 
 void wifiSetup() {
