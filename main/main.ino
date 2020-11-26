@@ -29,13 +29,14 @@ void initDHT();
 float leerHumedad();
 float llerTemperatura();
 int readMoisture();
+void setupUltrasonidos();
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Booting");
-  wifiSetup();
-  otaSetup();
-  mqttSetup();
+  //wifiSetup();
+  //otaSetup();
+  //mqttSetup();
   initDHT();
   Serial.println("Ready");
   Serial.print("IP address: ");
@@ -43,15 +44,18 @@ void setup() {
 }
 
 void loop() {
-  ArduinoOTA.handle();
+  /*ArduinoOTA.handle();
   if (!client.connected()){
     mqttReconnect();
   }
   client.loop();
-  //float temp = map(analogRead(33), 4095, 1, -60, 150);
-  //Serial.println(analogRead(33));
-  publishData("Moisture",readMoisture());
+  */
+  //publishData("Moisture",readMoisture());
   publishData("Temperatura", (int) leerTemperatura());
   publishData("Humedad", (int) leerHumedad());
-  delay(5000);
+  int  distancia=readUltrasonics();
+  Serial.print("Distancia:");
+  Serial.println(distancia);
+
+  delay(2000);
 }
