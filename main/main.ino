@@ -12,7 +12,7 @@
 #define DHTPIN 32
 #define DHTTYPE DHT22
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  0.5        /* Time ESP32 will go to sleep (in minutes) */
+#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in minutes) */
 
 enum estado{
   wifiOn,
@@ -34,7 +34,8 @@ DHT dht(DHTPIN, DHTTYPE);
 estado state = wifiOn;
 
 //Variables globales para compartir datos:
-
+float temperatura=0;
+float humedad=0;
 
 // Declaraciones funciones globales.
 void wifiSetup();
@@ -64,14 +65,16 @@ void loop() {
     case wifiOff: 
       Serial.print("Estado sin wifi: Leemos los sensores.\n");
       WiFi.disconnect(true);
-      WiFi.mode(WIFI_OFF);
-      state = wifiOn;
+      WiFi.mode(WIFI_OFF);      
       btStop();
       esp_wifi_stop();
       esp_bt_controller_disable();
 
       //Parte reservada para leer sensores 
-          
+      temperatura = leerTemperatura();
+      humedad = leerHumedad();
+
+      state = wifiOn;
       break;    
     case wifiOn: 
       Serial.print("Estado con wifi: Activamos el wifi, actualizamos los actuadores y mandamos los datos a thingsboard.\n");
@@ -87,9 +90,9 @@ void loop() {
     case lowPowerMode: 
       Serial.print("Estado low power: Nos vamos a dormir\n");
       state = wifiOff;
-      esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP *60 * us_to_seconds);
+      esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
       Serial.flush(); 
-      esp_deep_sleep_start();
+      esp_light_sleep_start();
       break;   
   }
 
