@@ -4,7 +4,6 @@ int soilMoistureValue = 0;
 int soilmoisturepercent = 0;
 
 
-
 int readMoisture() {
   soilMoistureValue = analogRead(34);  //put Sensor insert into soil
   Serial.println(soilMoistureValue);

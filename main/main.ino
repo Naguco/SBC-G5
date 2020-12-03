@@ -27,7 +27,6 @@ void mqttReconnect();
 void publishData(String sensor, int value);
 void initDHT();
 float leerHumedad();
-float llerTemperatura();
 int readMoisture();
 void setupUltrasonidos();
 

@@ -9,7 +9,6 @@ int distance;
 void setupUltrasonidos() {
 pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
 pinMode(echoPin, INPUT); // Sets the echoPin as an Input
-Serial.begin(9600); // Starts the serial communication
 }
 
 int readUltrasonics() {
