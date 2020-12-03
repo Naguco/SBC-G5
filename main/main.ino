@@ -4,13 +4,15 @@
 #include <ArduinoOTA.h>
 #include <PubSubClient.h>
 #include <DHT.h>
+#include <esp_wifi.h>
+#include <esp_bt.h>
 
 #define TOKEN "5Rdt2HPlKGz6bBQjc5Fc"
 #define CLIENTID "d76a30a0-24ea-11eb-b0e1-d73cf2f8386f"
 #define DHTPIN 32
 #define DHTTYPE DHT22
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  1        /* Time ESP32 will go to sleep (in minutes) */
+#define TIME_TO_SLEEP  0.5        /* Time ESP32 will go to sleep (in minutes) */
 
 enum estado{
   wifiOn,
@@ -61,6 +63,9 @@ void loop() {
       WiFi.disconnect(true);
       WiFi.mode(WIFI_OFF);
       state = wifiOn;
+      btStop();
+      esp_wifi_stop();
+      esp_bt_controller_disable();
 
       //Parte reservada para leer sensores     
       break;    
@@ -71,7 +76,9 @@ void loop() {
       //Parte reservada para dar o quitar el agua
       
       //Encendemos el wifi y mandamos los datos a Thingsboard
-      wifiSetup();     
+      wifiSetup();  
+
+      //Parte reservada para enviar datos 
       break;
     case lowPowerMode: 
       Serial.print("Estado low power: Nos vamos a dormir\n");
