@@ -33,6 +33,9 @@ DHT dht(DHTPIN, DHTTYPE);
 //Variable de estado principal
 estado state = wifiOn;
 
+//Variables globales para compartir datos:
+
+
 // Declaraciones funciones globales.
 void wifiSetup();
 void otaSetup();
@@ -67,7 +70,8 @@ void loop() {
       esp_wifi_stop();
       esp_bt_controller_disable();
 
-      //Parte reservada para leer sensores     
+      //Parte reservada para leer sensores 
+          
       break;    
     case wifiOn: 
       Serial.print("Estado con wifi: Activamos el wifi, actualizamos los actuadores y mandamos los datos a thingsboard.\n");
@@ -82,7 +86,7 @@ void loop() {
       break;
     case lowPowerMode: 
       Serial.print("Estado low power: Nos vamos a dormir\n");
-      state = wifiOn;
+      state = wifiOff;
       esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP *60 * us_to_seconds);
       Serial.flush(); 
       esp_deep_sleep_start();
