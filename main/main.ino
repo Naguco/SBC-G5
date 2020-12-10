@@ -92,7 +92,7 @@ void loop() {
       humedadTierra = readMoisture();
       Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
       distancia= readDistance();
-      Serial.print("Distancia:");Serial.println(distancia);
+      Serial.print("Nivel Agua:");Serial.print((distancia*100)/3); Serial.println("%");
       
       state = wifiOn;
       break;    
@@ -108,12 +108,17 @@ void loop() {
       Serial.println(WiFi.localIP());
       mqttSetup();
       mqttReconnect();
+      delay(1000);
 
       //Parte reservada para enviar datos 
       publishData("Temperatura",temperatura);
+      delay(500);
       publishData("Humedad Ambiental",humedad);
+      delay(500);
       publishData("Humedad Tierra",humedadTierra);
-      publishData("Nivel Agua",distancia);
+      delay(500);
+      publishData("Nivel Agua",(distancia*100)/3);
+      delay(500);
 
       break;
     case lowPowerMode: 
