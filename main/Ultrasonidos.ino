@@ -4,26 +4,15 @@ const int Pin = 2;
 long duration;
 int distance;
 
-void setupUltrasonidos() {
-}
-
-int readUltrasonics() {
-// Clears the trigPin
-pinMode(Pin, OUTPUT); // Sets the Pin as an Output
-digitalWrite(Pin, LOW);
-delay(1000);
-
-// Sets the trigPin on HIGH state for 10 micro seconds
-digitalWrite(Pin, HIGH);
-delay(1000);
-digitalWrite(Pin, LOW);
-
-// Reads the echoPin, returns the sound wave travel time in microseconds
-pinMode(Pin, INPUT); // Sets the Pin as an Input
-duration = pulseIn(Pin, HIGH);
-
-// Calculating the distance
-distance= duration*0.034/2;
-
-return distance;
+int readDistance() {
+    pinMode(Pin, OUTPUT);
+    digitalWrite(Pin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(Pin, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(Pin,LOW);
+    pinMode(Pin,INPUT);
+    duration = pulseIn(Pin,HIGH);
+    
+  return duration/29.0/2.0;
 }

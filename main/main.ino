@@ -13,7 +13,7 @@
 #define CLIENTID "d76a30a0-24ea-11eb-b0e1-d73cf2f8386f"
 #define DHTPIN 32
 #define DHTTYPE DHT22
-#define versionActual 0
+#define versionActual 1
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in minutes) */
 
@@ -42,6 +42,7 @@ estado state = wifiOff;
 float temperatura=0;
 float humedad=0;
 float humedadTierra=0;
+float distancia=0;
 
 // Declaraciones funciones globales.
 void wifiSetup();
@@ -63,15 +64,19 @@ void setup() {
   }
   
   Serial.println("Booting");
-  //wifiSetup();
+  wifiSetup();
   Serial.println("Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
   delay(1000);
-  //otaSetup();
-  //delay(5000);
-  //mqttSetup();
+  otaSetup();
+  delay(5000);
   initDHT();
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);      
+  btStop();
+  esp_wifi_stop();
+  esp_bt_controller_disable();
 }
 
 void loop() {
@@ -85,7 +90,9 @@ void loop() {
       humedad = leerHumedad();
       Serial.print("Humedad Ambiental:");Serial.println(humedad);
       humedadTierra = readMoisture();
-      Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");;
+      Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
+      distancia= readDistance();
+      Serial.print("Distancia:");Serial.println(distancia);
       
       state = wifiOn;
       break;    
@@ -96,9 +103,18 @@ void loop() {
       //Parte reservada para dar o quitar el agua
       
       //Encendemos el wifi y mandamos los datos a Thingsboard
-      wifiSetup();  
+      wifiSetup();
+      Serial.print("IP address: ");
+      Serial.println(WiFi.localIP());
+      mqttSetup();
+      mqttReconnect();
 
       //Parte reservada para enviar datos 
+      publishData("Temperatura",temperatura);
+      publishData("Humedad Ambiental",humedad);
+      publishData("Humedad Tierra",humedadTierra);
+      publishData("Nivel Agua",distancia);
+
       break;
     case lowPowerMode: 
       Serial.print("Estado low power: Apagamos todo y nos vamos a dormir\n");

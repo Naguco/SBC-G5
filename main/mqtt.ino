@@ -24,6 +24,5 @@ void publishData(String sensor, int value) {
   json.replace("value", String(value));
   Serial.println(json);
   json.toCharArray(charBuf,100);
-
   client.publish(publishTopic, charBuf);
 }
