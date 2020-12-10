@@ -41,6 +41,7 @@ estado state = wifiOff;
 //Variables globales para compartir datos:
 float temperatura=0;
 float humedad=0;
+float humedadTierra=0;
 
 // Declaraciones funciones globales.
 void wifiSetup();
@@ -51,7 +52,6 @@ void publishData(String sensor, int value);
 void initDHT();
 float leerHumedad();
 int readMoisture();
-void setupUltrasonidos();
 
 void setup() {
     Serial.begin(115200);
@@ -67,7 +67,7 @@ void setup() {
   Serial.println("Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  delay(5000);
+  delay(1000);
   //otaSetup();
   //delay(5000);
   //mqttSetup();
@@ -81,8 +81,12 @@ void loop() {
       
       //Parte reservada para leer sensores 
       temperatura = leerTemperatura();
+      Serial.print("Temperatura:");Serial.println(temperatura);
       humedad = leerHumedad();
-
+      Serial.print("Humedad Ambiental:");Serial.println(humedad);
+      humedadTierra = readMoisture();
+      Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");;
+      
       state = wifiOn;
       break;    
     case wifiOn: 

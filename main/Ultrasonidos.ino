@@ -1,32 +1,29 @@
 // defines pins numbers
-const int trigPin = 2;
-const int echoPin = 5;
-
+const int Pin = 2;
 // defines variables
 long duration;
 int distance;
 
 void setupUltrasonidos() {
-pinMode(trigPin, OUTPUT); // Sets the trigPin as an Output
-pinMode(echoPin, INPUT); // Sets the echoPin as an Input
 }
 
 int readUltrasonics() {
 // Clears the trigPin
-digitalWrite(trigPin, LOW);
+pinMode(Pin, OUTPUT); // Sets the Pin as an Output
+digitalWrite(Pin, LOW);
 delay(1000);
 
 // Sets the trigPin on HIGH state for 10 micro seconds
-digitalWrite(trigPin, HIGH);
+digitalWrite(Pin, HIGH);
 delay(1000);
-digitalWrite(trigPin, LOW);
+digitalWrite(Pin, LOW);
 
 // Reads the echoPin, returns the sound wave travel time in microseconds
-duration = pulseIn(echoPin, HIGH);
+pinMode(Pin, INPUT); // Sets the Pin as an Input
+duration = pulseIn(Pin, HIGH);
 
 // Calculating the distance
 distance= duration*0.034/2;
-
 
 return distance;
 }
