@@ -15,7 +15,7 @@
 #define DHTTYPE DHT22
 #define versionActual 0
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in minutes) */
+#define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in minutes) */
 
 enum estado{
   wifiOn,
@@ -34,8 +34,9 @@ char data[] = "Hola";
 //Variables del DHT
 DHT dht(DHTPIN, DHTTYPE);
 char checkedVersion = 0;
+
 //Variable de estado principal
-estado state = wifiOn;
+estado state = wifiOff;
 
 //Variables globales para compartir datos:
 float temperatura=0;
@@ -53,16 +54,23 @@ int readMoisture();
 void setupUltrasonidos();
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
+    
+  if(esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_TIMER){
+    Serial.println("Reseting System");
+    Serial.flush(); 
+    ESP.restart();
+  }
+  
   Serial.println("Booting");
-  wifiSetup();
+  //wifiSetup();
   Serial.println("Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
   delay(5000);
-  otaSetup();
-  delay(5000);
-  mqttSetup();
+  //otaSetup();
+  //delay(5000);
+  //mqttSetup();
   initDHT();
 }
 
@@ -70,12 +78,7 @@ void loop() {
   switch(state){
     case wifiOff: 
       Serial.print("Estado sin wifi: Leemos los sensores.\n");
-      WiFi.disconnect(true);
-      WiFi.mode(WIFI_OFF);      
-      btStop();
-      esp_wifi_stop();
-      esp_bt_controller_disable();
-
+      
       //Parte reservada para leer sensores 
       temperatura = leerTemperatura();
       humedad = leerHumedad();
@@ -94,19 +97,17 @@ void loop() {
       //Parte reservada para enviar datos 
       break;
     case lowPowerMode: 
-      Serial.print("Estado low power: Nos vamos a dormir\n");
+      Serial.print("Estado low power: Apagamos todo y nos vamos a dormir\n");
+      WiFi.disconnect(true);
+      WiFi.mode(WIFI_OFF);      
+      btStop();
+      esp_wifi_stop();
+      esp_bt_controller_disable();
       state = wifiOff;
+      
       esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
       Serial.flush(); 
-      esp_light_sleep_start();
+      esp_deep_sleep_start();
       break;   
   }
-  client.loop();
-  publishData("Moisture",readMoisture());
-  publishData("Temperatura", (int) leerTemperatura());
-  publishData("Humedad", (int) leerHumedad());
-  int  distancia=readUltrasonics();
-  Serial.print("Distancia:");
-  Serial.println(distancia);
-  */
 }
