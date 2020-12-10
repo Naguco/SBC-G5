@@ -4,6 +4,8 @@
 #include <ArduinoOTA.h>
 #include <PubSubClient.h>
 #include <DHT.h>
+#include <HTTPClient.h>
+#include <HTTPUpdate.h>
 #include <esp_wifi.h>
 #include <esp_bt.h>
 
@@ -11,6 +13,7 @@
 #define CLIENTID "d76a30a0-24ea-11eb-b0e1-d73cf2f8386f"
 #define DHTPIN 32
 #define DHTTYPE DHT22
+#define versionActual 0
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in minutes) */
 
@@ -30,6 +33,7 @@ PubSubClient client(espClient);
 char data[] = "Hola";
 //Variables del DHT
 DHT dht(DHTPIN, DHTTYPE);
+char checkedVersion = 0;
 //Variable de estado principal
 estado state = wifiOn;
 
@@ -51,13 +55,15 @@ void setupUltrasonidos();
 void setup() {
   Serial.begin(115200);
   Serial.println("Booting");
-  //wifiSetup();
-  //otaSetup();
-  //mqttSetup();
-  initDHT();
+  wifiSetup();
   Serial.println("Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  delay(5000);
+  otaSetup();
+  delay(5000);
+  mqttSetup();
+  initDHT();
 }
 
 void loop() {
@@ -95,10 +101,8 @@ void loop() {
       esp_light_sleep_start();
       break;   
   }
-
-
-  /*
-  //publishData("Moisture",readMoisture());
+  client.loop();
+  publishData("Moisture",readMoisture());
   publishData("Temperatura", (int) leerTemperatura());
   publishData("Humedad", (int) leerHumedad());
   int  distancia=readUltrasonics();
