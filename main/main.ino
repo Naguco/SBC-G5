@@ -1,7 +1,6 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
 #include <PubSubClient.h>
 #include <DHT.h>
 #include <HTTPClient.h>
@@ -57,6 +56,8 @@ void publishData(String sensor, int value);
 void initDHT();
 float leerHumedad();
 int readMoisture();
+float leerTemperatura();
+int readDistance();
 
 void setup() {
     Serial.begin(115200);
@@ -85,7 +86,7 @@ void setup() {
 
 void loop() {
   switch(state){
-    case wifiOff: {
+    case wifiOff: 
       Serial.println("--------------------------------------");
       Serial.print("Estado sin wifi: Leemos los sensores y actualizamos los actuadores.\n");
       
@@ -97,26 +98,19 @@ void loop() {
       humedadTierra = readMoisture();
       Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
       distancia= readDistance();
+      Serial.print(distancia);
       Serial.print("Nivel Agua:");Serial.print((distancia*100)/3); Serial.println("%");
 
-      //Parte reservada para dar o quitar el agua ahora solo encendemos 
-      
-      pinMode(GPIO_NUM_18, OUTPUT);
-      digitalWrite(GPIO_NUM_18, HIGH);
-      
-
-      
-
-      
-      state = wifiOn;}
+      //Decidimos si regamos o no
+      if(humedadTierra <= 40)
+        state= irrigate;
+      else
+        state = wifiOn;
+        
       break;    
     case wifiOn: 
       Serial.println("--------------------------------------");
       Serial.print("Estado con wifi: Activamos el wifi y mandamos los datos a thingsboard.\n");
-      state = lowPowerMode;
-
-
-
       
       //Encendemos el wifi y mandamos los datos a Thingsboard
       wifiSetup();
@@ -135,12 +129,33 @@ void loop() {
       delay(500);
       publishData("Nivel Agua",(distancia*100)/3);
       delay(500);
+            
+      state = lowPowerMode;
       break;
      case irrigate:
       {Serial.println("--------------------------------------");
       Serial.print("Estado Irrigate: Abrimos el riego, nos dormimos 10 min y volvemos a regar\n");      
-      state = wifiOn;
 
+      while(humedadTierra<=80){
+        Serial.print("Estado Irrigate: \n");      
+
+        rtc_gpio_init(GPIO_NUM_18); 
+        rtc_gpio_set_direction(GPIO_NUM_18, RTC_GPIO_MODE_OUTPUT_ONLY);
+        rtc_gpio_set_level(GPIO_NUM_18,1);
+        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+    
+        esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
+        Serial.flush(); 
+        println("Seguimos regando");
+        esp_light_sleep_start();
+
+        humedadTierra = readMoisture();
+        Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
+      }
+      
+      
+      state = wifiOn;
+      
       break;
       
     case lowPowerMode: 
@@ -151,13 +166,13 @@ void loop() {
       btStop();
       esp_wifi_stop();
       esp_bt_controller_disable();
-      state = wifiOff;
+      state = wifiOff;   
 
-    rtc_gpio_set_direction((GPIO_NUM_18)PIN_LORA_DIO_1, RTC_GPIO_MODE_OUTPUT_ONLY);
-    rtc_gpio_set_level((GPIO_NUM_18)PIN_LORA_RESET, HIGH);      
+      
       esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
       Serial.flush(); 
       esp_deep_sleep_start();
       break;   
   }
+}
 }
