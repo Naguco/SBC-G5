@@ -46,6 +46,13 @@ float temperatura=0;
 float humedad=0;
 float humedadTierra=0;
 float distancia=0;
+float Deposito=0;
+
+// Nums LEDS Pins
+int pinRED = 12;
+int pinGREEN = 14;
+int pinBLUE = 27;
+
 
 // Declaraciones funciones globales.
 void wifiSetup();
@@ -58,6 +65,12 @@ float leerHumedad();
 int readMoisture();
 float leerTemperatura();
 int readDistance();
+void encenderErrorWifiRojo();
+void encenderErrorMQTTAzul();
+void encenderValidoVerde();
+void encenderActualizandoAmarillo();
+void encenderErrorDepositoMorado();
+void apagarLEDs();
 
 void setup() {
     Serial.begin(115200);
@@ -67,7 +80,9 @@ void setup() {
     Serial.flush(); 
     ESP.restart();
   }
-  
+  pinMode(pinRED, OUTPUT);
+  pinMode(pinGREEN, OUTPUT);
+  pinMode(pinBLUE, OUTPUT);
   Serial.println("Booting");
   wifiSetup();
   Serial.println("Ready");
@@ -87,6 +102,11 @@ void setup() {
 void loop() {
   switch(state){
     case wifiOff: 
+      encenderValidoVerde();
+      delay(2000);
+      encenderErrorDepositoMorado();
+      delay(2000);
+      apagarLEDs();
       Serial.println("--------------------------------------");
       Serial.print("Estado sin wifi: Leemos los sensores y actualizamos los actuadores.\n");
       
@@ -99,13 +119,26 @@ void loop() {
       Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
       distancia= readDistance();
       Serial.print(distancia);
-      Serial.print("Nivel Agua:");Serial.print((distancia*100)/3); Serial.println("%");
+      Deposito=(distancia*100)/3;
+      Serial.print("Nivel Agua:");Serial.print(Deposito); Serial.println("%");
 
       //Decidimos si regamos o no
-      if(humedadTierra <= 40)
+      /*if(humedadTierra <= 40)
         state= irrigate;
-      else
+      else */
         state = wifiOn;
+
+      //Activamos el codigo de error del deposito si es necesario
+      if(Deposito <= 40){
+       int i;
+       for (i = 0; i < 10; i++) {
+          apagarLEDs();
+          delay(2000);
+          encenderErrorDepositoMorado();
+          delay(2000);
+      }
+      }
+       
         
       break;    
     case wifiOn: 
@@ -139,14 +172,16 @@ void loop() {
       while(humedadTierra<=80){
         Serial.print("Estado Irrigate: \n");      
 
-        rtc_gpio_init(GPIO_NUM_18); 
+        pinMode(GPIO_NUM_18, OUTPUT);
+        digitalWrite(18,HIGH);
+        /*rtc_gpio_init(GPIO_NUM_18); 
         rtc_gpio_set_direction(GPIO_NUM_18, RTC_GPIO_MODE_OUTPUT_ONLY);
         rtc_gpio_set_level(GPIO_NUM_18,1);
-        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);*/
     
         esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
         Serial.flush(); 
-        println("Seguimos regando");
+        Serial.println("Seguimos regando");
         esp_light_sleep_start();
 
         humedadTierra = readMoisture();

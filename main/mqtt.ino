@@ -1,5 +1,5 @@
 void mqttSetup() {
-  client.setServer("iot.etsisi.upm.es", 1883);
+  client.setServer("iot.etsisi.upm.es", 1883); //1883
 }
 
 void mqttReconnect() {
@@ -9,6 +9,13 @@ void mqttReconnect() {
       Serial.println("Connected to MQTT Broker");
       client.subscribe(publishTopic);
     } else {
+      int i;
+      for (i = 0; i < 10; i++) {
+        apagarLEDs();
+        delay(2000);
+        encenderErrorMQTTAzul();
+        delay(2000);
+      }
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println("try again in 5 second");
