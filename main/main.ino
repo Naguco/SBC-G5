@@ -19,7 +19,7 @@
 #define versionActual 1
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in minutes) */
-
+#define LED 18
 enum estado{
   wifiOn,
   wifiOff,
@@ -85,7 +85,7 @@ void setup() {
 
 void loop() {
   switch(state){
-    case wifiOff: 
+    case wifiOff: {
       Serial.println("--------------------------------------");
       Serial.print("Estado sin wifi: Leemos los sensores y actualizamos los actuadores.\n");
       
@@ -99,15 +99,16 @@ void loop() {
       distancia= readDistance();
       Serial.print("Nivel Agua:");Serial.print((distancia*100)/3); Serial.println("%");
 
-      //Parte reservada para dar o quitar el agua
-      int p=18;
-      digitalWrite(p, HIGH);
-      gpio_hold_en(GPIO_NUM_18);
-
+      //Parte reservada para dar o quitar el agua ahora solo encendemos 
+      
+      pinMode(GPIO_NUM_18, OUTPUT);
+      digitalWrite(GPIO_NUM_18, HIGH);
       
 
       
-      state = wifiOn;
+
+      
+      state = wifiOn;}
       break;    
     case wifiOn: 
       Serial.println("--------------------------------------");
@@ -134,14 +135,13 @@ void loop() {
       delay(500);
       publishData("Nivel Agua",(distancia*100)/3);
       delay(500);
-
       break;
-    case irrigate:
+     case irrigate:
       {Serial.println("--------------------------------------");
       Serial.print("Estado Irrigate: Abrimos el riego, nos dormimos 10 min y volvemos a regar\n");      
       state = wifiOn;
 
-      break;}
+      break;
       
     case lowPowerMode: 
       Serial.println("--------------------------------------");
@@ -152,7 +152,9 @@ void loop() {
       esp_wifi_stop();
       esp_bt_controller_disable();
       state = wifiOff;
-      
+
+    rtc_gpio_set_direction((GPIO_NUM_18)PIN_LORA_DIO_1, RTC_GPIO_MODE_OUTPUT_ONLY);
+    rtc_gpio_set_level((GPIO_NUM_18)PIN_LORA_RESET, HIGH);      
       esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
       Serial.flush(); 
       esp_deep_sleep_start();
