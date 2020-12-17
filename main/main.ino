@@ -8,6 +8,9 @@
 #include <HTTPUpdate.h>
 #include <esp_wifi.h>
 #include <esp_bt.h>
+#include "soc/rtc_cntl_reg.h"
+#include "soc/rtc.h"
+#include "driver/rtc_io.h"
 
 #define TOKEN "5Rdt2HPlKGz6bBQjc5Fc"
 #define CLIENTID "d76a30a0-24ea-11eb-b0e1-d73cf2f8386f"
@@ -20,6 +23,7 @@
 enum estado{
   wifiOn,
   wifiOff,
+  irrigate,
   lowPowerMode
 };
 
@@ -82,7 +86,8 @@ void setup() {
 void loop() {
   switch(state){
     case wifiOff: 
-      Serial.print("Estado sin wifi: Leemos los sensores.\n");
+      Serial.println("--------------------------------------");
+      Serial.print("Estado sin wifi: Leemos los sensores y actualizamos los actuadores.\n");
       
       //Parte reservada para leer sensores 
       temperatura = leerTemperatura();
@@ -93,14 +98,24 @@ void loop() {
       Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
       distancia= readDistance();
       Serial.print("Nivel Agua:");Serial.print((distancia*100)/3); Serial.println("%");
+
+      //Parte reservada para dar o quitar el agua
+      int p=18;
+      digitalWrite(p, HIGH);
+      gpio_hold_en(GPIO_NUM_18);
+
+      
+
       
       state = wifiOn;
       break;    
     case wifiOn: 
-      Serial.print("Estado con wifi: Activamos el wifi, actualizamos los actuadores y mandamos los datos a thingsboard.\n");
+      Serial.println("--------------------------------------");
+      Serial.print("Estado con wifi: Activamos el wifi y mandamos los datos a thingsboard.\n");
       state = lowPowerMode;
 
-      //Parte reservada para dar o quitar el agua
+
+
       
       //Encendemos el wifi y mandamos los datos a Thingsboard
       wifiSetup();
@@ -121,7 +136,15 @@ void loop() {
       delay(500);
 
       break;
+    case irrigate:
+      {Serial.println("--------------------------------------");
+      Serial.print("Estado Irrigate: Abrimos el riego, nos dormimos 10 min y volvemos a regar\n");      
+      state = wifiOn;
+
+      break;}
+      
     case lowPowerMode: 
+      Serial.println("--------------------------------------");
       Serial.print("Estado low power: Apagamos todo y nos vamos a dormir\n");
       WiFi.disconnect(true);
       WiFi.mode(WIFI_OFF);      

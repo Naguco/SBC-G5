@@ -23,5 +23,5 @@ void otaSetup() {
     } else {
       Serial.println("No tengo que actualizar!");
     }
-    Serial.printf("La version actual es la: %d", versionActual);
+    Serial.printf("La version actual es la: %d \n", versionActual);
 }

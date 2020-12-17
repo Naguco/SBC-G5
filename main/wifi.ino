@@ -1,5 +1,8 @@
+const char* ssid = "MOVISTAR_5C8E";
+const char* password = "kKVVEJJ2C36NnFEP675m";
+/*
 const char* ssid = "SBC";
-const char* password = "sbc$2020";
+const char* password = "sbc$2020";*/
 
 void wifiSetup() {
   WiFi.mode(WIFI_STA);
@@ -11,3 +14,5 @@ void wifiSetup() {
     ESP.restart();
   }
  }
+
+ 
