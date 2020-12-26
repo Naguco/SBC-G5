@@ -6,6 +6,8 @@ void otaSetup() {
   int versionEnNube = payload.toInt();
   if (versionEnNube > versionActual) {
       Serial.println("Actualización en marcha!");
+      encenderActualizandoAmarillo();
+      delay(5000);
       t_httpUpdate_return ret = httpUpdate.update(espClient, "http://esp32ota.herokuapp.com/latestFileVersion.bin");
       switch (ret) {
         case HTTP_UPDATE_FAILED:
