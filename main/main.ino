@@ -154,14 +154,18 @@ void loop() {
       delay(1000);
 
       //Parte reservada para enviar datos 
-      publishData("Temperatura",temperatura);
+      publishData("temperatura_ambiental",temperatura);
       delay(500);
-      publishData("Humedad Ambiental",humedad);
+      publishData("humedad_ambiental",humedad);
       delay(500);
-      publishData("Humedad Tierra",humedadTierra);
+      publishData("humedad_tierra",humedadTierra);
       delay(500);
-      publishData("Nivel Agua",(distancia*100)/3);
+      publishData("nivel_agua",(distancia*100)/3);
       delay(500);
+      //-----------------------------------------------------------------------------me falta el estado de regando, que es true o false
+      //publishData("regando", True);
+      //delay(500);
+
             
       state = lowPowerMode;
       break;
