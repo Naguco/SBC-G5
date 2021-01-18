@@ -122,7 +122,7 @@ void loop() {
       Deposito=(distancia*100)/3;
       Serial.print("Nivel Agua:");Serial.print(Deposito); Serial.println("%");
 
-      //Decidimos si regamos o no
+      //Decidimos si regamos o no 
       /*if(humedadTierra <= 40)
         state= irrigate;
       else */
@@ -162,7 +162,7 @@ void loop() {
       delay(500);
       publishData("nivel_agua",(distancia*100)/3);
       delay(500);
-      //-----------------------------------------------------------------------------me falta el estado de regando, que es true o false
+      //-----------------------------------------------------------------------------me falta el estado de regando, que es true o false---------POR HACER
       //publishData("regando", True);
       //delay(500);
 
