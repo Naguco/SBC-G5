@@ -5,21 +5,20 @@ void mqttSetup() {
 void mqttReconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection ....");
-    if (client.connect("ESP-32", "Li7Fp1RY5BH2sSG1jnsG", NULL)) {
+    if (client.connect("MACETERO ETSIAAB 1", "PL6gQwBTY30HXmOXEbiu", NULL)) {
       Serial.println("Connected to MQTT Broker");
       client.subscribe(publishTopic);
     } else {
       int i;
-      for (i = 0; i < 10; i++) {
-        apagarLEDs();
-        delay(2000);
-        encenderErrorMQTTAzul();
-        delay(2000);
-      }
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println("try again in 5 second");
-      delay(5000);
+      for (i = 0; i < 5; i++) {
+        apagarLEDs();
+        delay(500);
+        encenderErrorMQTTAzul();
+        delay(500);
+      }
     }
   }
 }

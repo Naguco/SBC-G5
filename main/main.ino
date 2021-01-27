@@ -1,15 +1,20 @@
-#include <WiFi.h>
-#include <ESPmDNS.h>
+ #include <WiFi.h>
 #include <WiFiUdp.h>
+#include <esp_wifi.h>
+
+#include <esp_bt.h>
+
 #include <PubSubClient.h>
-#include <DHT.h>
 #include <HTTPClient.h>
 #include <HTTPUpdate.h>
-#include <esp_wifi.h>
-#include <esp_bt.h>
+
+#include <DHT.h>
+
 #include "soc/rtc_cntl_reg.h"
 #include "soc/rtc.h"
 #include "driver/rtc_io.h"
+#include <ESPmDNS.h>
+
 
 #define TOKEN "5Rdt2HPlKGz6bBQjc5Fc"
 #define CLIENTID "d76a30a0-24ea-11eb-b0e1-d73cf2f8386f"
@@ -17,7 +22,7 @@
 #define DHTTYPE DHT22
 #define versionActual 1
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  5        /* Time ESP32 will go to sleep (in minutes) */
+#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in minutes) */
 #define LED 18
 enum estado{
   wifiOn,
@@ -28,7 +33,6 @@ enum estado{
 
 // Declaraciones variables globales.
 //Variables del Wifi y Thinsboard
-const char* serverName = "https://demo.thingsboard.io/api/v1/RLGdJssAKeG0PwnExDgr/telemetry";
 const char publishTopic[] = "v1/devices/me/telemetry";
 long lastData = 0;
 WiFiClient espClient;
@@ -103,10 +107,6 @@ void loop() {
   switch(state){
     case wifiOff: 
       encenderValidoVerde();
-      delay(2000);
-      encenderErrorDepositoMorado();
-      delay(2000);
-      apagarLEDs();
       Serial.println("--------------------------------------");
       Serial.print("Estado sin wifi: Leemos los sensores y actualizamos los actuadores.\n");
       
@@ -118,30 +118,38 @@ void loop() {
       humedadTierra = readMoisture();
       Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
       distancia= readDistance();
-      Serial.print(distancia);
-      Deposito=(distancia*100)/3;
+      Serial.println(distancia);
+      Deposito=100 - (distancia/10)*100 ;
       Serial.print("Nivel Agua:");Serial.print(Deposito); Serial.println("%");
 
-      //Decidimos si regamos o no 
-      /*if(humedadTierra <= 40)
+      //Decidimos si regamos o no
+      if(humedadTierra <= 20){
+        Serial.println("El nivel de Humedad de la tierra es menor al 20%. Es necesario regar.");
         state= irrigate;
-      else */
+      }
+      else{
+        Serial.println("El nivel de Humedad de la tierra es mayor al 20%. No es necesario regar.");
         state = wifiOn;
+      }
+        
 
       //Activamos el codigo de error del deposito si es necesario
-      if(Deposito <= 40){
+      if(Deposito <= 30){
        int i;
+       Serial.println("Deposito con poca agua");
        for (i = 0; i < 10; i++) {
           apagarLEDs();
-          delay(2000);
+          delay(1000);
           encenderErrorDepositoMorado();
-          delay(2000);
+          delay(1000);
+          ESP.restart();
       }
       }
        
         
       break;    
-    case wifiOn: 
+    case wifiOn:
+      encenderValidoVerde();
       Serial.println("--------------------------------------");
       Serial.print("Estado con wifi: Activamos el wifi y mandamos los datos a thingsboard.\n");
       
@@ -160,7 +168,7 @@ void loop() {
       delay(500);
       publishData("humedad_tierra",humedadTierra);
       delay(500);
-      publishData("nivel_agua",(distancia*100)/3);
+      publishData("nivel_agua",Deposito);
       delay(500);
       //-----------------------------------------------------------------------------me falta el estado de regando, que es true o false---------POR HACER
       //publishData("regando", True);
@@ -170,10 +178,11 @@ void loop() {
       state = lowPowerMode;
       break;
      case irrigate:
+     encenderValidoVerde();
       {Serial.println("--------------------------------------");
-      Serial.print("Estado Irrigate: Abrimos el riego, nos dormimos 10 min y volvemos a regar\n");      
+      Serial.print("Estado Irrigate: Abrimos el riego, nos dormimos 10 min \n y volvemos a comprobar si hay que regar\n");      
 
-      while(humedadTierra<=80){
+      while(humedadTierra<=35){
         Serial.print("Estado Irrigate: \n");      
 
         pinMode(GPIO_NUM_18, OUTPUT);
@@ -192,12 +201,11 @@ void loop() {
         Serial.print("Humedad de la Tierra:");Serial.print(humedadTierra);Serial.println("%");
       }
       
-      
       state = wifiOn;
-      
       break;
       
     case lowPowerMode: 
+      encenderValidoVerde();
       Serial.println("--------------------------------------");
       Serial.print("Estado low power: Apagamos todo y nos vamos a dormir\n");
       WiFi.disconnect(true);

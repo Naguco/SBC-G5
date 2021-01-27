@@ -10,11 +10,11 @@ void wifiSetup() {
   WiFi.begin(ssid, password);
   delay(5000);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Connection Failed! Rebooting...");
+    Serial.println("WiFi Connection Failed! Rebooting...");
     encenderErrorWifiRojo();
     delay(5000);
     int i;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 5; i++) {
       apagarLEDs();
       delay(500);
       encenderErrorWifiRojo();
