@@ -1,25 +1,28 @@
+/*
+const char* ssid = "Honor 10";
+const char* password = "wificarlos";
+*/
 const char* ssid = "SBC";
 const char* password = "sbc$2020";
 
 void wifiSetup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+  delay(5000);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("Connection Failed! Rebooting...");
+    Serial.println("WiFi Connection Failed! Rebooting...");
+    encenderErrorWifiRojo();
     delay(5000);
+    int i;
+    for (i = 0; i < 5; i++) {
+      apagarLEDs();
+      delay(500);
+      encenderErrorWifiRojo();
+      delay(500);
+    }
+    apagarLEDs();
     ESP.restart();
   }
+ }
 
-  // Port defaults to 3232
-  // ArduinoOTA.setPort(3232);
-
-  // Hostname defaults to esp3232-[MAC]
-  // ArduinoOTA.setHostname("myesp32");
-
-  // No authentication by default
-  // ArduinoOTA.setPassword("admin");
-
-  // Password can be set with it's md5 value as well
-  // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
-  // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
-}
+ 

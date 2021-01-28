@@ -1,18 +1,24 @@
 void mqttSetup() {
-  client.setServer("demo.thingsboard.io", 1883);
+  client.setServer("iot.etsisi.upm.es", 1883); //1883
 }
 
 void mqttReconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection ....");
-    if (client.connect("FranPruebaSBC", "Fran", "123456789")) {
+    if (client.connect("MACETERO ETSIAAB 1", "PL6gQwBTY30HXmOXEbiu", NULL)) {
       Serial.println("Connected to MQTT Broker");
       client.subscribe(publishTopic);
     } else {
+      int i;
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println("try again in 5 second");
-      delay(5000);
+      for (i = 0; i < 5; i++) {
+        apagarLEDs();
+        delay(500);
+        encenderErrorMQTTAzul();
+        delay(500);
+      }
     }
   }
 }
@@ -24,6 +30,5 @@ void publishData(String sensor, int value) {
   json.replace("value", String(value));
   Serial.println(json);
   json.toCharArray(charBuf,100);
-
   client.publish(publishTopic, charBuf);
 }
