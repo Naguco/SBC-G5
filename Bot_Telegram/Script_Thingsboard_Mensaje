@@ -1,0 +1,40 @@
+var newMsg ={};
+ //Datos
+ dispositivo = metadata.deviceName;
+ TA = msg.temperatura_ambiental;
+ HA = msg.humedad_ambiental;
+ NA = msg.nivel_agua;
+ HT = msg.humedad_tierra;
+ R = msg.regando;
+ 
+ if(TA == undefined) {
+     TA = "\"NULL\""
+ }
+ 
+ if(HA == undefined) {
+     HA = "\"NULL\""
+ }
+ 
+  if(NA == undefined) {
+     NA = "\"NULL\""
+ }
+ 
+  if(HT == undefined) {
+     HT = "\"NULL\""
+ }
+ 
+   if(R == undefined) {
+     R = "\"NULL\""
+ }
+ 
+ //Aqui lo mandanmos a la nueva API
+ 
+ newMsg = '{ "Dispositivo": "' + dispositivo + '", "Temperatura_Ambiental": ' + TA + ', "Humedad_Ambiental": ' + HA + ', "Nivel_Agua": ' + NA + ', "Humedad_Tierra": ' + HT + ', "Regando": ' + R +' }';
+ 
+ 
+ //La siguiente parte publica directamente en el chat de telegram, pero no como usuario, sino como el propio bot
+ /*newMsg.text = "{ \"Dispositivo\": \"" + dispositivo + "\", \"Temperatura_Ambiental\": " + TA + ",  \"Humedad_Ambiental\": " + HA + ", \"Nivel_Agua\": " + NA + ", \"Humedad_Tierra\": " + HT + ", \"Regando\": " + R +" }";
+ 
+ newMsg.chat_id = 429098717; //has to be replaced by the actual chat id
+ */
+ return {msg: newMsg, metadata: metadata, msgType: msgType};
