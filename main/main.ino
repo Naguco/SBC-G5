@@ -1,17 +1,17 @@
- #include <WiFi.h>
-#include <WiFiUdp.h>
-#include <esp_wifi.h>
+#include <WiFi.h>  creo que no sirve para nada porque no da error
+#include <WiFiUdp.h>  
+#include <esp_wifi.h>  
 
 #include <esp_bt.h>
 
-#include <PubSubClient.h>
-#include <HTTPClient.h>
+#include <PubSubClient.h> 
+#include <HTTPClient.h> 
 #include <HTTPUpdate.h>
 
-#include <DHT.h>
+#include <DHT.h> /needed
 
-#include "soc/rtc_cntl_reg.h"
-#include "soc/rtc.h"
+#include "soc/rtc_cntl_reg.h" 
+#include "soc/rtc.h" 
 #include "driver/rtc_io.h"
 #include <ESPmDNS.h>
 
@@ -22,7 +22,7 @@
 #define DHTTYPE DHT22
 #define versionActual 1
 #define us_to_seconds 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  10        /* Time ESP32 will go to sleep (in minutes) */
+#define TIME_TO_SLEEP  60        /* Time ESP32 will go to sleep (in minutes) */
 #define LED 18
 enum estado{
   wifiOn,
@@ -182,7 +182,7 @@ void loop() {
       {Serial.println("--------------------------------------");
       Serial.print("Estado Irrigate: Abrimos el riego, nos dormimos 10 min \n y volvemos a comprobar si hay que regar\n");      
 
-      while(humedadTierra<=35){
+      while(humedadTierra<=30){
         Serial.print("Estado Irrigate: \n");      
 
         pinMode(GPIO_NUM_18, OUTPUT);
@@ -192,7 +192,7 @@ void loop() {
         rtc_gpio_set_level(GPIO_NUM_18,1);
         esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);*/
     
-        esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
+        esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds );
         Serial.flush(); 
         Serial.println("Seguimos regando");
         esp_light_sleep_start();
