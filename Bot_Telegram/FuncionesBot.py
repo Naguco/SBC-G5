@@ -181,7 +181,7 @@ def avisoRetardo(Suscritos: Queue):
             #Vamos revisando cada maceta
             maceta = get_dispositivo(d)
             txt = ""
-
+#----------------------------------------------------------------------------AVISOS-----------------------------------------------------------------------------
             #Aviso 1: Deposito vacio
             if (maceta[datos_json[3]] != "NULL"):
 
@@ -189,6 +189,19 @@ def avisoRetardo(Suscritos: Queue):
                     txt += "La maceta "  + maceta[datos_json[0]] + " necesita que le rellenen el deposito.\n"
 
 
+            #Aviso 2: Temperatura ambiental superior a 35 grados
+            if (maceta[datos_json[1]] != "NULL"):
+
+                if int(maceta[datos_json[1]]) >= 35 : #grados del sensor
+                    txt += "La maceta "  + maceta[datos_json[0]] + " se encuentra a una temperatura igual o superior a 35 grados.\n"
+
+            #Aviso 3: Temperatura ambiental inferior a 0 grados
+            if (maceta[datos_json[1]] != "NULL"):
+
+                if int(maceta[datos_json[1]]) >= 9 : #grados del sensor
+                    txt += "La maceta "  + maceta[datos_json[0]] + " se encuentra a una temperatura igual o inferior a 0 grados.\n"
+
+#---------------------------------------------------------------------FIN_AVISOS--------------------------------------------------------------------------------
             #Por ultimo mandamos el aviso de la maceta actual
             if txt != "":
                 for c in lista_suscritos:
