@@ -8,7 +8,7 @@
 #include <HTTPClient.h> 
 #include <HTTPUpdate.h>
 
-#include <DHT.h> /needed
+#include <DHT.h> //needed
 
 #include "soc/rtc_cntl_reg.h" 
 #include "soc/rtc.h" 
@@ -51,6 +51,7 @@ float humedad=0;
 float humedadTierra=0;
 float distancia=0;
 float Deposito=0;
+bool depositoBajo=false;
 
 // Nums LEDS Pins
 int pinRED = 12;
@@ -135,15 +136,7 @@ void loop() {
 
       //Activamos el codigo de error del deposito si es necesario
       if(Deposito <= 30){
-       int i;
-       Serial.println("Deposito con poca agua");
-       for (i = 0; i < 10; i++) {
-          apagarLEDs();
-          delay(1000);
-          encenderErrorDepositoMorado();
-          delay(1000);
-          ESP.restart();
-      }
+        depositoBajo= true; 
       }
        
         
@@ -215,7 +208,18 @@ void loop() {
       esp_bt_controller_disable();
       state = wifiOff;   
 
-      
+      if(depositoBajo == true){
+        int i;
+       Serial.println("Deposito con poca agua");
+       for (i = 0; i < 10; i++) {
+          apagarLEDs();
+          delay(1000);
+          encenderErrorDepositoMorado();
+          delay(1000);
+          ESP.restart();
+      }
+      }
+       
       esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * us_to_seconds);
       Serial.flush(); 
       esp_deep_sleep_start();

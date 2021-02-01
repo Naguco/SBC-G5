@@ -3,9 +3,11 @@ void mqttSetup() {
 }
 
 void mqttReconnect() {
+  int counter = 0;
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection ....");
     if (client.connect("MACETERO ETSIAAB 1", "PL6gQwBTY30HXmOXEbiu", NULL)) {
+      counter = 0;
       Serial.println("Connected to MQTT Broker");
       client.subscribe(publishTopic);
     } else {
@@ -18,6 +20,10 @@ void mqttReconnect() {
         delay(500);
         encenderErrorMQTTAzul();
         delay(500);
+      }
+      counter++;
+      if(counter == 5) {
+        ESP.restart();
       }
     }
   }
