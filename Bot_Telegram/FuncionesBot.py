@@ -185,7 +185,7 @@ def avisoRetardo(Suscritos: Queue):
             #Aviso 1: Deposito vacio
             if (maceta[datos_json[3]] != "NULL"):
 
-                if int(maceta[datos_json[3]]) >= 9 : #9 cm es lo que mide el sensor ultrasonidos en nuestro deposito
+                if int(maceta[datos_json[3]]) <= 30 : # lo que mide el sensor ultrasonidos en nuestro deposito
                     txt += "La maceta "  + maceta[datos_json[0]] + " necesita que le rellenen el deposito.\n"
 
 
@@ -198,7 +198,7 @@ def avisoRetardo(Suscritos: Queue):
             #Aviso 3: Temperatura ambiental inferior a 0 grados
             if (maceta[datos_json[1]] != "NULL"):
 
-                if int(maceta[datos_json[1]]) >= 9 : #grados del sensor
+                if int(maceta[datos_json[1]]) <= 0 : #grados del sensor
                     txt += "La maceta "  + maceta[datos_json[0]] + " se encuentra a una temperatura igual o inferior a 0 grados.\n"
 
 #---------------------------------------------------------------------FIN_AVISOS--------------------------------------------------------------------------------
