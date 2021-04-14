@@ -9,7 +9,7 @@ void mqttReconnect() {
     if (client.connect("MACETERO ETSIAAB 1", "PL6gQwBTY30HXmOXEbiu", NULL)) {
       counter = 0;
       Serial.println("Connected to MQTT Broker");
-      client.subscribe(publishTopic);
+      client.subscribe("v1/devices/me/telemetry");
     } else {
       int i;
       Serial.print("failed, rc=");

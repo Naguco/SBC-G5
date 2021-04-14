@@ -1,3 +1,9 @@
+void setupPinsLED() {
+  pinMode(pinRED, OUTPUT);
+  pinMode(pinGREEN, OUTPUT);
+  pinMode(pinBLUE, OUTPUT);
+}
+
 void encenderErrorWifiRojo() {
   digitalWrite(pinRED, HIGH);
   digitalWrite(pinGREEN, LOW);
